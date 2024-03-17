@@ -1,0 +1,9 @@
+google-cloud-run
+google-cloud-functions
+google-cloud-workflows
+google-cloud-scheduler
+google-cloud-iam
+google-cloud-dataform
+google-cloud-bigquery-datatransfer
+google-cloud-bigquery-datapolicies
+google-cloud-storage-transfer

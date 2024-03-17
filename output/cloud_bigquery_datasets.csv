@@ -1,0 +1,12 @@
+Project,Dataset
+nhealth-th-cdp-landing-prd-01,CX_nhealth_Batch
+nhealth-th-cdp-landing-prd-01,CX_nhealth_SYNC
+nhealth-th-cdp-landing-prd-01,CX_nhealth_Stream
+nhealth-th-cdp-landing-prd-01,config
+nhealth-th-cdp-landing-prd-01,delete_XWTBBQ1lnTD5WlnaiqOK
+nhealth-th-cdp-landing-prd-01,dl_01_datalake
+nhealth-th-cdp-landing-prd-01,dw_01_cdp
+nhealth-th-cdp-landing-prd-01,dw_02_connectx
+nhealth-th-cdp-landing-prd-01,report
+nhealth-th-cdp-landing-prd-01,temp
+nhealth-th-cdp-curated-prd-01,nhealth_model

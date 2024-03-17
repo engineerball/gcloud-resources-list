@@ -1,0 +1,6 @@
+Project,Service
+nhealth-th-cdp-landing-prd-01,nilecon-alert-exist-folder
+nhealth-th-cdp-process-prd-01,nhealth-cdp-apiserver
+nhealth-th-cdp-process-prd-01,connectx-product-api
+nhealth-th-cdp-process-prd-01,connectx-order-item-api
+nhealth-th-cdp-process-prd-01,connectx-order-api

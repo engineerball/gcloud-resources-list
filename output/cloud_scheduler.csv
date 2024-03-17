@@ -1,0 +1,5 @@
+Project,Scheduler
+nhealth-th-cdp-landing-prd-01,daily-export-primo
+nhealth-th-cdp-landing-prd-01,daily-ingest-nhealth-nilecon
+nhealth-th-cdp-process-prd-01,daily-export-connectx
+nhealth-th-cdp-process-prd-01,daily-export-primo
