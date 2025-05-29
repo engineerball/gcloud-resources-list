@@ -30,12 +30,14 @@ The tool collects information about the following GCP resources:
 ## Installation
 
 1. Clone this repository:
+
 ```bash
 git clone <repository-url>
 cd <repository-directory>
 ```
 
 2. Install the required Python packages:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -43,21 +45,25 @@ pip install -r requirements.txt
 ## Usage
 
 1. Ensure you have the correct GCP credentials:
+
 ```bash
 gcloud auth application-default login
 ```
 
 2. Run the script for generate config:
+
 ```bash
 python build_config.py --fid=<GCP_FOLDER_ID>
 ```
 
 3. Run the script:
+
 ```bash
 python main.py
 ```
 
 The script will:
+
 - Create an `output` directory if it doesn't exist
 - Generate CSV files for each resource type
 - Show progress in the console
@@ -86,6 +92,7 @@ The tool generates the following CSV files in the `output` directory:
 ## Error Handling
 
 The tool includes error handling for:
+
 - API rate limits
 - Permission issues
 - Network problems
