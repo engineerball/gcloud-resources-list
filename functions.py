@@ -440,7 +440,6 @@ def get_cloud_scheduler(projects, location):
 
 
 def get_cloud_storage(projects, location, credentials):
-    from google.cloud import storage
     from googleapiclient import discovery
     import csv
 
@@ -560,7 +559,7 @@ def get_compute_engine_instance(projects, location):
             # Create the client.
             client = compute_v1.InstancesClient()
 
-            parent = f"projects/{project}/locations/{location}"
+            # parent = f"projects/{project}/locations/{location}"
 
             for zone in ["a", "b", "c"]:
                 # Initialize request argument(s)

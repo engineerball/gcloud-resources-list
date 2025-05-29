@@ -1,5 +1,4 @@
 from google.cloud import resourcemanager_v3
-import os
 import yaml
 import argparse
 
