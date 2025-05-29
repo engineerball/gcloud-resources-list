@@ -1,0 +1,22 @@
+[project]
+name = "google-cloud-resources-list"
+version = "0.1.0"
+description = "Generate a list of Google Cloud resources"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-api-python-client>=2.170.0",
+    "google-auth>=2.40.2",
+    "google-cloud-bigquery>=3.33.0",
+    "google-cloud-bigquery-datapolicies>=0.6.14",
+    "google-cloud-bigquery-datatransfer>=3.19.1",
+    "google-cloud-compute>=1.30.0",
+    "google-cloud-dataform>=0.6.2",
+    "google-cloud-functions>=1.20.3",
+    "google-cloud-kms>=3.5.1",
+    "google-cloud-run>=0.10.18",
+    "google-cloud-scheduler>=2.16.1",
+    "google-cloud-storage>=3.1.0",
+    "google-cloud-workflows>=1.18.1",
+    "pyyaml>=6.0.1",
+]

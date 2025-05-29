@@ -1,4 +1,5 @@
 version: 1
 location: asia-southeast1
+gcp_folder_id: '349721816874'
 projects:
-  - dev-test-services
+  - my-project-id-1
