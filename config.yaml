@@ -1,9 +1,6 @@
 version: 1
 location: asia-southeast1
 projects:
-  - nhealth-th-cdp-landing-prd-01
-  - nhealth-th-cdp-process-prd-01
-  - nhealth-th-cdp-curated-prd-01
-  - nhealth-th-cdp-consume-prd-01
-  - nhealth-th-cdp-common-prd-01
-  - nhealth-th-cdp-monitor-prd-01
+- metagen-dev
+- metagen-prd
+gcp_folder_id: '349721816874'

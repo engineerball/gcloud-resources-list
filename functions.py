@@ -149,6 +149,44 @@ def get_bigquery_datasets(projects, location):
             )
             continue
 
+def get_bigquery_datasets_tables(projects, location):
+    from google.cloud import bigquery
+    import csv
+
+    # Loop through each project
+    for project in projects:
+        print(f"Authenticating with project: {project}")
+
+        try:
+            # Get Cloud Workflows for the project
+            print(f"Getting BigQuery Datasets for project: {project}")
+            # Create the client.
+            client = bigquery.Client(project=project)
+
+            # Make the request
+            page_result = client.list_datasets()
+            # for response in page_result:
+            #     print(response)
+
+            # Write to csv file with project and service
+            with open("output/cloud_bigquery_datasets_tables.csv", "a", newline="") as file:
+                writer = csv.writer(file)
+                if file.tell() == 0:
+                    writer.writerow(["Project", "Dataset", "Table"])
+
+                for service in page_result:
+                    print(f"Service: {service.dataset_id}")
+                    # for tables in client.list_tables(service.data)
+                    tables = client.list_tables(service.dataset_id)
+                    for table in tables:
+                        writer.writerow([table.project, table.dataset_id, table.table_id])
+
+        except Exception as e:
+            print(
+                f"Failed to get Cloud BigQuery Datasets for project: {project}. Error: {str(e)}"
+            )
+            continue
+
 
 def get_bigquery_jobs(projects, location):
     from google.cloud import bigquery
@@ -401,7 +439,7 @@ def get_cloud_scheduler(projects, location):
             continue
 
 
-def get_cloud_storage(projects, credentials, location):
+def get_cloud_storage(projects, location, credentials):
     from google.cloud import storage
     from googleapiclient import discovery
     import csv
@@ -475,7 +513,7 @@ def get_cloud_workflow(projects, location):
             continue
 
 
-def get_cloud_service_account(projects, credentials, location):
+def get_cloud_service_account(projects, location, credentials):
     from googleapiclient import discovery
     import csv
 
@@ -506,3 +544,137 @@ def get_cloud_service_account(projects, credentials, location):
                     writer.writerow([project, service_account["email"]])
         else:
             print(f"No service accounts found for project: {project}")
+
+
+def get_compute_engine_instance(projects, location):
+    from google.cloud import compute_v1
+    import csv
+
+    # Loop through each project
+    for project in projects:
+        print(f"Authenticating with project: {project}")
+
+        try:
+            # Get Cloud Workflows for the project
+            print(f"Getting Compute Engine instance list for project: {project}")
+            # Create the client.
+            client = compute_v1.InstancesClient()
+
+            parent = f"projects/{project}/locations/{location}"
+
+            for zone in ["a", "b", "c"]:
+                # Initialize request argument(s)
+                request = compute_v1.ListInstancesRequest(
+                    project=project,
+                    zone=f"{location}-{zone}"
+                )
+
+                # Make the request
+                page_result = client.list(request=request)
+                # for response in page_result:
+                #     print(response)
+
+                # Write to csv file with project and service
+                with open(
+                    "output/cloud_compute_engine_instances.csv", "a", newline=""
+                ) as file:
+                    writer = csv.writer(file)
+                    if file.tell() == 0:
+                        writer.writerow(["Project", "Instances", "Zone"])
+
+                    for service in page_result:
+                        print(f"Service: {service.name}")
+                        writer.writerow([project, service.name, service.zone.split("/")[-1]])
+        except Exception as e:
+            print(
+                f"Failed to get Cloud Compute Engine instances for project: {project}. Error: {str(e)}"
+            )
+            continue
+        
+        
+def get_cloud_iam_roles(projects, location, credentials):
+    from googleapiclient import discovery
+    import csv
+
+    # Loop through each project
+    for project in projects:
+        print(f"Authenticating with project: {project}")
+
+        try:
+            # Get IAM roles for the project
+            print(f"Getting IAM roles for project: {project}")
+            service = discovery.build("iam", "v1", credentials=credentials)
+            resource_manager = discovery.build("cloudresourcemanager", "v1", credentials=credentials)
+            
+            # Get all service accounts first
+            service_accounts = service.projects().serviceAccounts().list(name=f"projects/{project}").execute()
+            
+            if "accounts" in service_accounts:
+                # Open CSV file for writing
+                with open("output/service_account_roles.csv", "a", newline="") as file:
+                    writer = csv.writer(file)
+                    if file.tell() == 0:
+                        writer.writerow(["Project", "Service Account", "Role", "Binding Type"])
+                    
+                    # For each service account, get its roles
+                    for service_account in service_accounts["accounts"]:
+                        service_account_email = service_account["email"]
+                        print(f"Getting roles for service account: {service_account_email}")
+                        
+                        # 1. Get direct IAM policy for the service account
+                        try:
+                            policy = service.projects().serviceAccounts().getIamPolicy(
+                                resource=service_account["name"]
+                            ).execute()
+                            
+                            if "bindings" in policy:
+                                for binding in policy["bindings"]:
+                                    role = binding["role"]
+                                    print(f"Direct Role: {role}")
+                                    writer.writerow([project, service_account_email, role, "Direct"])
+                        except Exception as e:
+                            print(f"Error getting direct IAM policy: {str(e)}")
+                        
+                        # 2. Get project-level IAM policy
+                        try:
+                            project_policy = resource_manager.projects().getIamPolicy(
+                                resource=project,
+                                body={}
+                            ).execute()
+                            
+                            if "bindings" in project_policy:
+                                for binding in project_policy["bindings"]:
+                                    role = binding["role"]
+                                    members = binding.get("members", [])
+                                    if f"serviceAccount:{service_account_email}" in members:
+                                        print(f"Project Role: {role}")
+                                        writer.writerow([project, service_account_email, role, "Project"])
+                        except Exception as e:
+                            print(f"Error getting project IAM policy: {str(e)}")
+                        
+                        # 3. Get organization-level IAM policy if available
+                        try:
+                            # Get organization ID from project
+                            project_info = resource_manager.projects().get(projectId=project).execute()
+                            if "parent" in project_info and project_info["parent"]["type"] == "organization":
+                                org_id = project_info["parent"]["id"]
+                                org_policy = resource_manager.organizations().getIamPolicy(
+                                    resource=f"organizations/{org_id}",
+                                    body={}
+                                ).execute()
+                                
+                                if "bindings" in org_policy:
+                                    for binding in org_policy["bindings"]:
+                                        role = binding["role"]
+                                        members = binding.get("members", [])
+                                        if f"serviceAccount:{service_account_email}" in members:
+                                            print(f"Organization Role: {role}")
+                                            writer.writerow([project, service_account_email, role, "Organization"])
+                        except Exception as e:
+                            print(f"Error getting organization IAM policy: {str(e)}")
+            else:
+                print(f"No service accounts found for project: {project}")
+                
+        except Exception as e:
+            print(f"Failed to get IAM roles for project: {project}. Error: {str(e)}")
+            continue

@@ -7,3 +7,6 @@ google-cloud-dataform
 google-cloud-bigquery-datatransfer
 google-cloud-bigquery-datapolicies
 google-cloud-storage-transfer
+google-cloud-compute
+google-cloud-resource-manager
+google-cloud-kms

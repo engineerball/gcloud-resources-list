@@ -12,6 +12,10 @@ from functions import (
     get_cloud_run,
     get_cloud_scheduler,
     get_cloud_workflow,
+    get_compute_engine_instance,
+    get_cloud_storage,
+    get_bigquery_datasets_tables,
+    get_cloud_iam_roles
 )
 from functions import get_cloud_service_account
 
@@ -24,15 +28,19 @@ credentials, _ = get_credentials()
 
 # Function to get the GCP resource information
 def get_gcp_resource_info(projects, location):
-    get_bigquery_datapolicies(projects, location)
-    get_bigquery_datasets(projects, location)
-    get_dataform(projects, location)
-    get_cloud_function(projects, location)
-    get_cloud_kms(projects, location)
-    get_cloud_run(projects, location)
-    get_cloud_scheduler(projects, location)
-    get_cloud_workflow(projects, location)
-    get_cloud_service_account(projects, credentials, location)
+    # get_bigquery_datapolicies(projects, location)
+    # get_bigquery_datasets(projects, location)
+    # get_dataform(projects, location)
+    # get_cloud_function(projects, location)
+    # get_cloud_kms(projects, location)
+    # get_cloud_run(projects, location)
+    # get_cloud_scheduler(projects, location)
+    # get_cloud_workflow(projects, location)
+    # get_cloud_service_account(projects, location, credentials)
+    # get_compute_engine_instance(projects, location)
+    # get_cloud_storage(projects, location, credentials)
+    # get_bigquery_datasets_tables(projects, location)
+    get_cloud_iam_roles(projects, location, credentials)
 
 
 if __name__ == "__main__":
