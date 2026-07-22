@@ -1,0 +1,1 @@
+"""GCP resource inventory tool."""
