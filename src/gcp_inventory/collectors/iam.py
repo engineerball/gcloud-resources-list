@@ -122,7 +122,9 @@ def service_account_roles(ctx: CollectorContext) -> RowIterator:
             direct_policy = {}
 
         for binding in direct_policy.get("bindings", []):
-            yield ctx.project, email, binding["role"], "Direct"
+            members = binding.get("members", [])
+            if f"serviceAccount:{email}" in members:
+                yield ctx.project, email, binding["role"], "Direct"
 
         for binding in project_policy.get("bindings", []):
             members = binding.get("members", [])

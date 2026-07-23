@@ -75,7 +75,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_roles = sa_sub.add_parser(
         "roles", help="dump SA project-role bindings to CSV", parents=[common]
     )
-    p_roles.add_argument("--source-project", required=True)
+    p_roles.add_argument(
+        "--source-project",
+        help="single project to dump; omit to read projects from --config",
+    )
+    p_roles.add_argument(
+        "--config",
+        default="config.yaml",
+        help="config file to read projects from when --source-project is omitted",
+    )
     p_roles.add_argument("--output-csv", default="sa_roles.csv")
 
     return parser
@@ -123,13 +131,26 @@ def _dispatch(args: argparse.Namespace) -> int:
 
 def _dispatch_sa(args: argparse.Namespace) -> int:
     from gcp_inventory.auth import get_credentials
+    from gcp_inventory.config import load_config
     from gcp_inventory.sa.roles import get_service_accounts_with_roles, save_roles_csv
 
-    service_accounts = get_service_accounts_with_roles(
-        args.source_project, get_credentials()
-    )
+    if args.source_project:
+        projects: tuple[str, ...] = (args.source_project,)
+    else:
+        projects = load_config(args.config).projects
+
+    credentials = get_credentials()
+    service_accounts: dict[str, dict] = {}
+    for project in projects:
+        try:
+            service_accounts.update(
+                get_service_accounts_with_roles(project, credentials)
+            )
+        except Exception:  # noqa: BLE001 - one project must not abort the rest
+            logger.exception("failed to read service accounts from project %s", project)
+
     if not service_accounts:
-        logger.error("no service accounts found in project %s", args.source_project)
+        logger.error("no service accounts found in projects: %s", ", ".join(projects))
         return EXIT_FATAL
 
     save_roles_csv(service_accounts, args.output_csv)

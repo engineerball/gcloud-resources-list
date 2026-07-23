@@ -28,21 +28,24 @@ def test_save_roles_csv(tmp_path) -> None:
             "name": "default",
             "display_name": "Default",
             "email": "default@src-proj-compute@developer.gserviceaccount.com",
+            "project": "src-proj",
             "project_roles": [rb("roles/owner")],
         },
         "user-sa@src-proj.iam.gserviceaccount.com": {
             "name": "user-sa",
             "display_name": "User SA",
             "email": "user-sa@src-proj.iam.gserviceaccount.com",
+            "project": "src-proj",
             "project_roles": [
                 rb("roles/viewer"),
                 rb("roles/editor", {"title": "only-dev", "expression": "true"}),
             ],
         },
-        "no-roles-sa@src-proj.iam.gserviceaccount.com": {
+        "no-roles-sa@other-proj.iam.gserviceaccount.com": {
             "name": "no-roles-sa",
             "display_name": "No Roles SA",
-            "email": "no-roles-sa@src-proj.iam.gserviceaccount.com",
+            "email": "no-roles-sa@other-proj.iam.gserviceaccount.com",
+            "project": "other-proj",
             "project_roles": [],
         },
     }
@@ -53,16 +56,17 @@ def test_save_roles_csv(tmp_path) -> None:
     with output_file.open(newline="") as f:
         rows = list(csv.reader(f))
 
-    assert rows[0] == ["Service Account", "Display Name", "Role", "Condition"]
+    assert rows[0] == ["Project", "Service Account", "Display Name", "Role", "Condition"]
     # Default SA is skipped entirely.
-    assert not any("compute@developer" in row[0] for row in rows[1:])
+    assert not any("compute@developer" in row[1] for row in rows[1:])
     # Roles for user-sa are sorted; conditional binding carries its title.
     sa = "user-sa@src-proj.iam.gserviceaccount.com"
-    assert [sa, "User SA", "roles/editor", "only-dev"] in rows
-    assert [sa, "User SA", "roles/viewer", ""] in rows
-    # SA with no roles gets the placeholder row.
+    assert ["src-proj", sa, "User SA", "roles/editor", "only-dev"] in rows
+    assert ["src-proj", sa, "User SA", "roles/viewer", ""] in rows
+    # SA with no roles gets the placeholder row, tagged with its own project.
     assert [
-        "no-roles-sa@src-proj.iam.gserviceaccount.com",
+        "other-proj",
+        "no-roles-sa@other-proj.iam.gserviceaccount.com",
         "No Roles SA",
         "No project roles",
         "",

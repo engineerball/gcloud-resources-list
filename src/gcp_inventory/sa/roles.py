@@ -80,6 +80,7 @@ def get_service_accounts_with_roles(
             "name": sa_name,
             "display_name": name,
             "email": email,
+            "project": source_project,
             "project_roles": [],
         }
 
@@ -111,17 +112,19 @@ def save_roles_csv(service_accounts: dict[str, dict], output_file: str | Path) -
     """
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Service Account", "Display Name", "Role", "Condition"])
+        writer.writerow(["Project", "Service Account", "Display Name", "Role", "Condition"])
 
         for email, details in sorted(service_accounts.items()):
             if is_default_service_account(email):
                 continue
 
+            project = details.get("project", "")
             if details["project_roles"]:
                 for binding in sorted(details["project_roles"], key=binding_sort_key):
                     condition = binding.get("condition") or {}
                     writer.writerow(
                         [
+                            project,
                             email,
                             details["display_name"],
                             binding["role"],
@@ -129,6 +132,8 @@ def save_roles_csv(service_accounts: dict[str, dict], output_file: str | Path) -
                         ]
                     )
             else:
-                writer.writerow([email, details["display_name"], "No project roles", ""])
+                writer.writerow(
+                    [project, email, details["display_name"], "No project roles", ""]
+                )
 
     logger.info("Saved to: %s", output_file)
